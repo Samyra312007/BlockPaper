@@ -6,6 +6,7 @@ import { formatCurrency } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { WalletButton } from "@/components/wallet/wallet-button";
+import { SentinelPill } from "@/components/sentinel-pill";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
@@ -38,6 +39,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="flex items-center gap-3">
+          <SentinelPill />
+
           <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 font-medium">
             DEMO MODE &mdash; Paper Trading
           </Badge>

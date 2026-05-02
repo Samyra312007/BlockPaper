@@ -2,6 +2,7 @@ import app from "./app";
 import { logger } from "./lib/logger";
 import { startPriceSimulation } from "./lib/prices";
 import { seedCandles } from "./lib/candles";
+import { startSentinelMonitor } from "./routes/sentinel";
 
 const rawPort = process.env["PORT"];
 
@@ -26,6 +27,7 @@ app.listen(port, async (err) => {
   logger.info({ port }, "Server listening");
 
   startPriceSimulation();
+  startSentinelMonitor();
 
   try {
     await seedCandles();

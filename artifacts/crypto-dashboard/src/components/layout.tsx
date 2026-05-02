@@ -57,7 +57,7 @@ function SidebarPanel({ collapsed, onToggle, onClose }: SidebarPanelProps) {
       `}
     >
       {/* ── Logo ──────────────────────────────────────────────────── */}
-      <div className="h-14 flex items-center border-b border-border shrink-0 px-3 overflow-hidden">
+      <div className="h-12 flex items-center border-b border-border shrink-0 px-3 overflow-hidden">
         <Link
           href="/"
           onClick={onClose}
@@ -73,6 +73,22 @@ function SidebarPanel({ collapsed, onToggle, onClose }: SidebarPanelProps) {
           </span>
         </Link>
       </div>
+
+      {/* ── Collapse toggle — desktop only, sits just below logo ── */}
+      {!isMobile && (
+        <button
+          onClick={onToggle}
+          className={`w-full flex items-center h-8 border-b border-border/60 shrink-0 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors ${
+            collapsed ? "justify-center px-0" : "justify-end px-3"
+          }`}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {collapsed
+            ? <ChevronRight className="h-3.5 w-3.5" />
+            : <ChevronLeft className="h-3.5 w-3.5" />
+          }
+        </button>
+      )}
 
       {/* ── Navigation ────────────────────────────────────────────── */}
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
@@ -160,21 +176,6 @@ function SidebarPanel({ collapsed, onToggle, onClose }: SidebarPanelProps) {
           </Button>
         </div>
 
-        {/* ── Collapse toggle — desktop only ───────────────────── */}
-        {!isMobile && (
-          <button
-            onClick={onToggle}
-            className={`w-full flex items-center py-2.5 border-t border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors ${
-              collapsed ? "justify-center px-0" : "justify-end px-3"
-            }`}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {collapsed
-              ? <ChevronRight className="h-4 w-4" />
-              : <ChevronLeft className="h-4 w-4" />
-            }
-          </button>
-        )}
       </div>
     </aside>
   );

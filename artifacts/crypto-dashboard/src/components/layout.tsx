@@ -80,15 +80,8 @@ function SidebarPanel({ onClose }: { onClose?: () => void }) {
         })}
       </nav>
 
-      {/* Bottom utilities + user */}
+      {/* Bottom: user info only */}
       <div className="border-t border-border shrink-0">
-        {/* Tools row */}
-        <div className="flex items-center gap-1.5 px-3 py-2.5 border-b border-border/60">
-          <SentinelPill />
-          <WalletButton />
-          <NotificationBell />
-        </div>
-
         {/* User info */}
         <div className="px-3 py-3 flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
@@ -155,6 +148,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       {/* ── Main area ───────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+
+        {/* Desktop-only top bar — Sentinel + Wallet + Bell */}
+        <header className="hidden lg:flex h-12 border-b border-border items-center justify-end gap-2 px-4 bg-card shrink-0">
+          <SentinelPill />
+          <WalletButton />
+          <NotificationBell />
+        </header>
 
         {/* Mobile-only top bar */}
         <header className="lg:hidden h-14 border-b border-border flex items-center justify-between px-4 bg-card shrink-0 z-40">

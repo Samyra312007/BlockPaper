@@ -249,3 +249,73 @@ export const CancelOrderResponse = zod.object({
   filledAt: zod.coerce.date().nullable(),
   createdAt: zod.coerce.date(),
 });
+
+/**
+ * @summary Get AI-generated trading signals for all assets
+ */
+export const GetAiSignalsHeader = zod.object({
+  Authorization: zod
+    .string()
+    .optional()
+    .describe("Opaque session token — Bearer <sid>."),
+});
+
+export const GetAiSignalsResponse = zod.object({
+  signals: zod.array(
+    zod.object({
+      symbol: zod.string(),
+      signal: zod.enum(["BUY", "SELL", "HOLD"]),
+      confidence: zod.number().describe("Confidence percentage 0-100"),
+      reasoning: zod.string(),
+      technicals: zod.object({
+        rsi: zod.number().describe("RSI (14-period)"),
+        macd: zod.number(),
+        signal: zod.number(),
+        histogram: zod.number(),
+        sma20: zod.number(),
+        sma50: zod.number(),
+        ema12: zod.number(),
+        ema26: zod.number(),
+      }),
+      suggestedQuantity: zod.number(),
+      suggestedPrice: zod.number(),
+    }),
+  ),
+  generatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Get AI-generated daily market summary
+ */
+export const GetMarketSummaryHeader = zod.object({
+  Authorization: zod
+    .string()
+    .optional()
+    .describe("Opaque session token — Bearer <sid>."),
+});
+
+export const GetMarketSummaryResponse = zod.object({
+  summary: zod.string(),
+  sentiment: zod.enum(["bullish", "bearish", "neutral"]),
+  keyPoints: zod.array(zod.string()),
+  generatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Send a message to the AI trading assistant (SSE stream)
+ */
+export const SendAiChatMessageHeader = zod.object({
+  Authorization: zod
+    .string()
+    .optional()
+    .describe("Opaque session token — Bearer <sid>."),
+});
+
+export const SendAiChatMessageBody = zod.object({
+  messages: zod.array(
+    zod.object({
+      role: zod.enum(["user", "assistant"]),
+      content: zod.string(),
+    }),
+  ),
+});

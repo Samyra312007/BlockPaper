@@ -181,6 +181,76 @@ export interface PlaceOrderBody {
   limitPrice?: number | null;
 }
 
+export interface TechnicalIndicators {
+  /** RSI (14-period) */
+  rsi: number;
+  macd: number;
+  signal: number;
+  histogram: number;
+  sma20: number;
+  sma50: number;
+  ema12: number;
+  ema26: number;
+}
+
+export type TradeSignalSignal =
+  (typeof TradeSignalSignal)[keyof typeof TradeSignalSignal];
+
+export const TradeSignalSignal = {
+  BUY: "BUY",
+  SELL: "SELL",
+  HOLD: "HOLD",
+} as const;
+
+export interface TradeSignal {
+  symbol: string;
+  signal: TradeSignalSignal;
+  /** Confidence percentage 0-100 */
+  confidence: number;
+  reasoning: string;
+  technicals: TechnicalIndicators;
+  suggestedQuantity: number;
+  suggestedPrice: number;
+}
+
+export interface SignalsResponse {
+  signals: TradeSignal[];
+  generatedAt: string;
+}
+
+export type MarketSummarySentiment =
+  (typeof MarketSummarySentiment)[keyof typeof MarketSummarySentiment];
+
+export const MarketSummarySentiment = {
+  bullish: "bullish",
+  bearish: "bearish",
+  neutral: "neutral",
+} as const;
+
+export interface MarketSummary {
+  summary: string;
+  sentiment: MarketSummarySentiment;
+  keyPoints: string[];
+  generatedAt: string;
+}
+
+export type AiChatMessageRole =
+  (typeof AiChatMessageRole)[keyof typeof AiChatMessageRole];
+
+export const AiChatMessageRole = {
+  user: "user",
+  assistant: "assistant",
+} as const;
+
+export interface AiChatMessage {
+  role: AiChatMessageRole;
+  content: string;
+}
+
+export interface AiChatRequest {
+  messages: AiChatMessage[];
+}
+
 /**
  * Opaque session token — Bearer <sid>.
  */

@@ -50,6 +50,7 @@
     "@vitejs/plugin-react": "catalog:",
     "@workspace/api-client-react": "workspace:*",
     "@workspace/replit-auth-web": "workspace:*",
+    "@workspace/integrations-openai-ai-react": "workspace:*",
     "lightweight-charts": "^5.0.7",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",

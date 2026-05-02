@@ -18,6 +18,8 @@ tags:
     description: User portfolio and account
   - name: orders
     description: Trade order management
+  - name: ai
+    description: AI trading assistant
 paths:
   /healthz:
     get:
@@ -335,6 +337,60 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
 
+  /openai/signals:
+    get:
+      operationId: getAiSignals
+      tags: [ai]
+      summary: Get AI-generated trading signals for all assets
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+        - $ref: '#/components/parameters/SessionCookie'
+      responses:
+        '200':
+          description: Trading signals generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalsResponse'
+
+  /openai/market-summary:
+    get:
+      operationId: getMarketSummary
+      tags: [ai]
+      summary: Get AI-generated daily market summary
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+        - $ref: '#/components/parameters/SessionCookie'
+      responses:
+        '200':
+          description: Market summary generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketSummary'
+
+  /openai/chat:
+    post:
+      operationId: sendAiChatMessage
+      tags: [ai]
+      summary: Send a message to the AI trading assistant (SSE stream)
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+        - $ref: '#/components/parameters/SessionCookie'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiChatRequest'
+      responses:
+        '200':
+          description: Streaming SSE response
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
 components:
   parameters:
     AuthorizationSessionHeader:
@@ -608,3 +664,94 @@ components:
           minimum: 0
         limitPrice:
           type: ["number", "null"]
+
+    TechnicalIndicators:
+      type: object
+      required: [rsi, macd, signal, histogram, sma20, sma50, ema12, ema26]
+      properties:
+        rsi:
+          type: number
+          description: RSI (14-period)
+        macd:
+          type: number
+        signal:
+          type: number
+        histogram:
+          type: number
+        sma20:
+          type: number
+        sma50:
+          type: number
+        ema12:
+          type: number
+        ema26:
+          type: number
+
+    TradeSignal:
+      type: object
+      required: [symbol, signal, confidence, reasoning, technicals, suggestedQuantity, suggestedPrice]
+      properties:
+        symbol:
+          type: string
+        signal:
+          type: string
+          enum: [BUY, SELL, HOLD]
+        confidence:
+          type: number
+          description: Confidence percentage 0-100
+        reasoning:
+          type: string
+        technicals:
+          $ref: '#/components/schemas/TechnicalIndicators'
+        suggestedQuantity:
+          type: number
+        suggestedPrice:
+          type: number
+
+    SignalsResponse:
+      type: object
+      required: [signals, generatedAt]
+      properties:
+        signals:
+          type: array
+          items:
+            $ref: '#/components/schemas/TradeSignal'
+        generatedAt:
+          type: string
+          format: date-time
+
+    MarketSummary:
+      type: object
+      required: [summary, sentiment, keyPoints, generatedAt]
+      properties:
+        summary:
+          type: string
+        sentiment:
+          type: string
+          enum: [bullish, bearish, neutral]
+        keyPoints:
+          type: array
+          items:
+            type: string
+        generatedAt:
+          type: string
+          format: date-time
+
+    AiChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+
+    AiChatRequest:
+      type: object
+      required: [messages]
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AiChatMessage'

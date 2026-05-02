@@ -18,6 +18,7 @@ import type {
 
 import type {
   Account,
+  AiChatRequest,
   AssetPrice,
   AuthUserEnvelope,
   BeginBrowserLoginParams,
@@ -28,12 +29,14 @@ import type {
   HandleBrowserLoginCallbackParams,
   HealthStatus,
   LogoutSuccess,
+  MarketSummary,
   MobileTokenExchangeRequest,
   MobileTokenExchangeSuccess,
   Order,
   PlaceOrderBody,
   Portfolio,
   PortfolioSummary,
+  SignalsResponse,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -1309,4 +1312,240 @@ export const useCancelOrder = <
   TContext
 > => {
   return useMutation(getCancelOrderMutationOptions(options));
+};
+
+/**
+ * @summary Get AI-generated trading signals for all assets
+ */
+export const getGetAiSignalsUrl = () => {
+  return `/api/openai/signals`;
+};
+
+export const getAiSignals = async (
+  options?: RequestInit,
+): Promise<SignalsResponse> => {
+  return customFetch<SignalsResponse>(getGetAiSignalsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetAiSignalsQueryKey = () => {
+  return [`/api/openai/signals`] as const;
+};
+
+export const getGetAiSignalsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAiSignals>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getAiSignals>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAiSignalsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAiSignals>>> = ({
+    signal,
+  }) => getAiSignals({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAiSignals>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetAiSignalsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAiSignals>>
+>;
+export type GetAiSignalsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get AI-generated trading signals for all assets
+ */
+
+export function useGetAiSignals<
+  TData = Awaited<ReturnType<typeof getAiSignals>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getAiSignals>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetAiSignalsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get AI-generated daily market summary
+ */
+export const getGetMarketSummaryUrl = () => {
+  return `/api/openai/market-summary`;
+};
+
+export const getMarketSummary = async (
+  options?: RequestInit,
+): Promise<MarketSummary> => {
+  return customFetch<MarketSummary>(getGetMarketSummaryUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetMarketSummaryQueryKey = () => {
+  return [`/api/openai/market-summary`] as const;
+};
+
+export const getGetMarketSummaryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMarketSummary>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getMarketSummary>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetMarketSummaryQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getMarketSummary>>
+  > = ({ signal }) => getMarketSummary({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMarketSummary>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetMarketSummaryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMarketSummary>>
+>;
+export type GetMarketSummaryQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get AI-generated daily market summary
+ */
+
+export function useGetMarketSummary<
+  TData = Awaited<ReturnType<typeof getMarketSummary>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getMarketSummary>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetMarketSummaryQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Send a message to the AI trading assistant (SSE stream)
+ */
+export const getSendAiChatMessageUrl = () => {
+  return `/api/openai/chat`;
+};
+
+export const sendAiChatMessage = async (
+  aiChatRequest: AiChatRequest,
+  options?: RequestInit,
+): Promise<string> => {
+  return customFetch<string>(getSendAiChatMessageUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(aiChatRequest),
+  });
+};
+
+export const getSendAiChatMessageMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendAiChatMessage>>,
+    TError,
+    { data: BodyType<AiChatRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof sendAiChatMessage>>,
+  TError,
+  { data: BodyType<AiChatRequest> },
+  TContext
+> => {
+  const mutationKey = ["sendAiChatMessage"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof sendAiChatMessage>>,
+    { data: BodyType<AiChatRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return sendAiChatMessage(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SendAiChatMessageMutationResult = NonNullable<
+  Awaited<ReturnType<typeof sendAiChatMessage>>
+>;
+export type SendAiChatMessageMutationBody = BodyType<AiChatRequest>;
+export type SendAiChatMessageMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Send a message to the AI trading assistant (SSE stream)
+ */
+export const useSendAiChatMessage = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendAiChatMessage>>,
+    TError,
+    { data: BodyType<AiChatRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof sendAiChatMessage>>,
+  TError,
+  { data: BodyType<AiChatRequest> },
+  TContext
+> => {
+  return useMutation(getSendAiChatMessageMutationOptions(options));
 };

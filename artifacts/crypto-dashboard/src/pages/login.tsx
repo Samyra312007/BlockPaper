@@ -301,12 +301,6 @@ export default function Login() {
               {isLoading ? "Authenticating…" : "Start Paper Trading"}
               <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </button>
-            <a
-              href="#demo"
-              className="flex items-center gap-2 bg-white/[0.06] hover:bg-white/[0.10] border border-white/10 hover:border-white/20 text-white/75 hover:text-white font-semibold px-8 py-3.5 rounded-xl text-base transition-all duration-300"
-            >
-              View Demo <ChevronDown className="h-4 w-4 animate-bounce" />
-            </a>
           </div>
 
           <p className="bp-cta text-[11px] text-white/25 pt-1 tracking-wide">

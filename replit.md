@@ -55,6 +55,15 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - Routes: `/api/gamification/quests`, `/api/gamification/badges`, `/api/gamification/contest`
 - Frontend: `/quests` page (Daily Quests / Badges / Weekly Contest tabs)
 
+### Backtesting Engine
+- **Data**: 111 daily candles per symbol (BTC/ETH/SOL/BNB) seeded at startup via `seedDailyCandles()`
+- **Strategies**: SMA Crossover, RSI, Bollinger Bands — pure-math indicators, no dependencies
+- **AI parsing**: POST body `{type:"ai", prompt:"..."}` → GPT-4o-mini → structured StrategyConfig
+- **Routes**: `POST /api/backtest`, `POST /api/backtest/compare`
+- **Metrics returned**: total return %, buy & hold return %, win rate, max drawdown, Sharpe ratio, avg win/loss, full trade log, equity curve with buy-hold baseline
+- **Frontend**: `/backtest` — left config sidebar (asset, days, strategy tabs, presets) + right results panel (metric cards, Recharts equity curve, trade log)
+- **Compare mode**: runs two strategy backtests in parallel, overlays equity curves in the chart, shows side-by-side stats
+
 ## Architecture Notes
 - Server uses `http.createServer(app)` — do NOT revert to `app.listen()` (WS upgrade handler depends on this)
 - New API endpoints (sentinel, rooms, gamification) use plain `fetch` — not Orval-generated hooks

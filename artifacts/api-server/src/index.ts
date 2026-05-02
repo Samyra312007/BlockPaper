@@ -6,6 +6,7 @@ import { seedCandles } from "./lib/candles";
 import { startSentinelMonitor } from "./routes/sentinel";
 import { startWsServer } from "./lib/ws-server";
 import { startWeeklyMonitor } from "./lib/gamification";
+import { seedDailyCandles } from "./lib/candles";
 
 const rawPort = process.env["PORT"];
 
@@ -31,6 +32,7 @@ httpServer.listen(port, async () => {
 
   try {
     await seedCandles();
+    await seedDailyCandles();
   } catch (e) {
     logger.warn({ err: e }, "Could not seed candles (DB may not be ready)");
   }

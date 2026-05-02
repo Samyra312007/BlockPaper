@@ -112,6 +112,56 @@ export async function appendCurrentCandle(symbol: string) {
   }
 }
 
+export async function seedDailyCandles() {
+  const existing = await db.select().from(candlesTable).where(eq(candlesTable.interval, "1d")).limit(1);
+  if (existing.length > 0) {
+    logger.info("daily candles already seeded");
+    return;
+  }
+
+  const BASE_PRICES: Record<string, number> = { BTC: 64000, ETH: 3200, SOL: 160, BNB: 540 };
+  const now = Math.floor(Date.now() / 1000);
+  const oneDay = 86400;
+  const numCandles = 110; // extra warm-up headroom for indicators
+
+  const rows: typeof candlesTable.$inferInsert[] = [];
+
+  for (const symbol of SYMBOLS) {
+    let price = BASE_PRICES[symbol]!;
+    const baseVolume = symbol === "BTC" ? 28000 : symbol === "ETH" ? 200000 : symbol === "SOL" ? 2000000 : 90000;
+
+    for (let i = numCandles; i >= 0; i--) {
+      const time = now - i * oneDay;
+      // Align to midnight UTC
+      const dayTime = Math.floor(time / oneDay) * oneDay;
+      const open = price;
+      const change = price * 0.032 * (Math.random() * 2 - 1);
+      const close = Math.max(price + change, price * 0.001);
+      const high = Math.max(open, close) * (1 + Math.random() * 0.015);
+      const low = Math.min(open, close) * (1 - Math.random() * 0.015);
+      const volume = baseVolume * (0.6 + Math.random() * 0.8);
+
+      rows.push({
+        symbol,
+        interval: "1d",
+        time: String(dayTime),
+        open: String(open.toFixed(8)),
+        high: String(high.toFixed(8)),
+        low: String(low.toFixed(8)),
+        close: String(close.toFixed(8)),
+        volume: String(volume.toFixed(8)),
+      });
+
+      price = close;
+    }
+  }
+
+  for (let i = 0; i < rows.length; i += 100) {
+    await db.insert(candlesTable).values(rows.slice(i, i + 100));
+  }
+  logger.info({ count: rows.length }, "daily candles seeded");
+}
+
 export async function getCandles(symbol: string, interval: string = "1h", limit: number = 100): Promise<CandleData[]> {
   const rows = await db
     .select()

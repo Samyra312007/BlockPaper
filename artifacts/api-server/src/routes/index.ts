@@ -8,6 +8,7 @@ import walletRouter from "./wallet";
 import sentinelRouter from "./sentinel";
 import roomsRouter from "./rooms";
 import gamificationRouter from "./gamification";
+import backtestRouter from "./backtest";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(walletRouter);
 router.use(sentinelRouter);
 router.use(roomsRouter);
 router.use(gamificationRouter);
+router.use(backtestRouter);
 
 export default router;

@@ -4,7 +4,8 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useGetAccount } from "@workspace/api-client-react";
 import {
   Activity, LogOut, Briefcase, History, LineChart, Brain, Users,
-  Trophy, FlaskConical, LayoutGrid, Gauge, Bell, Radio, Menu, X,
+  Trophy, FlaskConical, LayoutGrid, Gauge, Bell, Radio,
+  Menu, X, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -30,10 +31,17 @@ const NAV_LINKS = [
 
 // ─── Sidebar panel ────────────────────────────────────────────────────────────
 
-function SidebarPanel({ onClose }: { onClose?: () => void }) {
+interface SidebarPanelProps {
+  collapsed: boolean;
+  onToggle: () => void;
+  onClose?: () => void; // mobile-only: close the overlay
+}
+
+function SidebarPanel({ collapsed, onToggle, onClose }: SidebarPanelProps) {
   const { user, logout } = useAuth();
   const [location] = useLocation();
   const { data: account } = useGetAccount();
+  const isMobile = Boolean(onClose);
 
   function handleLogout() {
     onClose?.();
@@ -41,68 +49,132 @@ function SidebarPanel({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <aside className="w-[220px] h-full flex flex-col bg-card border-r border-border shrink-0">
-      {/* Logo */}
-      <div className="h-14 flex items-center px-4 border-b border-border shrink-0">
+    <aside
+      className={`
+        h-full flex flex-col bg-card border-r border-border shrink-0 overflow-hidden
+        transition-[width] duration-200 ease-in-out
+        ${isMobile || !collapsed ? "w-[220px]" : "w-[60px]"}
+      `}
+    >
+      {/* ── Logo ──────────────────────────────────────────────────── */}
+      <div className="h-14 flex items-center border-b border-border shrink-0 px-3 overflow-hidden">
         <Link
           href="/"
           onClick={onClose}
-          className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2.5 hover:opacity-80 transition-opacity min-w-0"
         >
           <Activity className="h-5 w-5 text-primary shrink-0" />
-          <span className="font-bold text-lg tracking-tight">BlockPaper</span>
+          <span
+            className={`font-bold text-lg tracking-tight whitespace-nowrap transition-[opacity,max-width] duration-200 ${
+              collapsed && !isMobile ? "opacity-0 max-w-0" : "opacity-100 max-w-[160px]"
+            }`}
+          >
+            BlockPaper
+          </span>
         </Link>
       </div>
 
-      {/* Navigation */}
+      {/* ── Navigation ────────────────────────────────────────────── */}
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
         {NAV_LINKS.map(({ href, label, icon: Icon, match }) => {
           const active = match(location);
+          const isCollapsed = collapsed && !isMobile;
           return (
             <Link
               key={href}
               href={href}
               onClick={onClose}
-              className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors relative ${
-                active
+              title={isCollapsed ? label : undefined}
+              className={`
+                group flex items-center rounded-lg text-sm font-medium
+                transition-colors relative overflow-hidden
+                ${isCollapsed ? "justify-center py-2.5 px-0" : "gap-3 px-3 py-2.5"}
+                ${active
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/70"
-              }`}
+                }
+              `}
             >
-              {/* Active accent bar */}
-              {active && (
+              {/* Active accent bar — only when expanded */}
+              {active && !isCollapsed && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-primary rounded-r-full" />
               )}
-              <Icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`} />
-              {label}
+
+              <Icon
+                className={`h-4 w-4 shrink-0 ${
+                  active ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                }`}
+              />
+
+              {/* Label fades out when collapsed */}
+              <span
+                className={`whitespace-nowrap transition-[opacity,max-width] duration-200 ${
+                  isCollapsed ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-[140px]"
+                }`}
+              >
+                {label}
+              </span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Bottom: user info only */}
+      {/* ── User footer ───────────────────────────────────────────── */}
       <div className="border-t border-border shrink-0">
-        {/* User info */}
-        <div className="px-3 py-3 flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+        <div
+          className={`py-3 flex items-center gap-2 overflow-hidden ${
+            collapsed && !isMobile ? "justify-center px-0" : "px-3"
+          }`}
+        >
+          {/* Avatar — always visible */}
+          <div
+            className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm shrink-0"
+            title={collapsed && !isMobile ? (user?.firstName ?? "Trader") : undefined}
+          >
             {user?.firstName?.[0] ?? "U"}
           </div>
-          <div className="flex-1 min-w-0">
+
+          {/* Name + cash — hidden when collapsed */}
+          <div
+            className={`flex-1 min-w-0 transition-[opacity,max-width] duration-200 ${
+              collapsed && !isMobile ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-[120px]"
+            }`}
+          >
             <div className="text-xs font-medium truncate">{user?.firstName ?? "Trader"}</div>
             <div className="text-[11px] font-mono text-muted-foreground truncate">
               {account ? formatCurrency(account.cashBalance) : "—"}
             </div>
           </div>
+
+          {/* Logout — hidden when collapsed */}
           <Button
             variant="ghost"
             size="icon"
             onClick={handleLogout}
-            className="h-7 w-7 text-muted-foreground hover:text-foreground shrink-0"
+            className={`h-7 w-7 text-muted-foreground hover:text-foreground shrink-0 transition-[opacity,max-width] duration-200 ${
+              collapsed && !isMobile ? "opacity-0 max-w-0 overflow-hidden p-0" : "opacity-100"
+            }`}
             title="Sign out"
           >
             <LogOut className="h-3.5 w-3.5" />
           </Button>
         </div>
+
+        {/* ── Collapse toggle — desktop only ───────────────────── */}
+        {!isMobile && (
+          <button
+            onClick={onToggle}
+            className={`w-full flex items-center py-2.5 border-t border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors ${
+              collapsed ? "justify-center px-0" : "justify-end px-3"
+            }`}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed
+              ? <ChevronRight className="h-4 w-4" />
+              : <ChevronLeft className="h-4 w-4" />
+            }
+          </button>
+        )}
       </div>
     </aside>
   );
@@ -110,25 +182,38 @@ function SidebarPanel({ onClose }: { onClose?: () => void }) {
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
+function readCollapsed(): boolean {
+  try { return localStorage.getItem("bp-sidebar-collapsed") === "true"; } catch { return false; }
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(readCollapsed);
 
-  // Close sidebar on navigation
+  // Close mobile drawer on navigation
   useEffect(() => { setSidebarOpen(false); }, [location]);
 
-  // Prevent body scroll when mobile sidebar open
+  // Lock body scroll while mobile drawer is open
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [sidebarOpen]);
+
+  function toggleCollapsed() {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try { localStorage.setItem("bp-sidebar-collapsed", String(next)); } catch {}
+      return next;
+    });
+  }
 
   return (
     <div className="h-screen flex overflow-hidden bg-background text-foreground">
 
       {/* ── Desktop sidebar ─────────────────────────────────────────── */}
       <div className="hidden lg:flex h-full">
-        <SidebarPanel />
+        <SidebarPanel collapsed={collapsed} onToggle={toggleCollapsed} />
       </div>
 
       {/* ── Mobile sidebar overlay ──────────────────────────────────── */}
@@ -137,11 +222,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
           className="lg:hidden fixed inset-0 z-50 flex"
           onClick={() => setSidebarOpen(false)}
         >
-          {/* Sidebar panel — stop click propagation so it doesn't close itself */}
           <div className="h-full" onClick={(e) => e.stopPropagation()}>
-            <SidebarPanel onClose={() => setSidebarOpen(false)} />
+            <SidebarPanel
+              collapsed={false}
+              onToggle={() => {}}
+              onClose={() => setSidebarOpen(false)}
+            />
           </div>
-          {/* Dark backdrop */}
           <div className="flex-1 bg-black/50 backdrop-blur-sm" />
         </div>
       )}
@@ -149,14 +236,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* ── Main area ───────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
-        {/* Desktop-only top bar — Sentinel + Wallet + Bell */}
+        {/* Desktop top bar */}
         <header className="hidden lg:flex h-12 border-b border-border items-center justify-end gap-2 px-4 bg-card shrink-0">
           <SentinelPill />
           <WalletButton />
           <NotificationBell />
         </header>
 
-        {/* Mobile-only top bar */}
+        {/* Mobile top bar */}
         <header className="lg:hidden h-14 border-b border-border flex items-center justify-between px-4 bg-card shrink-0 z-40">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Activity className="h-5 w-5 text-primary" />

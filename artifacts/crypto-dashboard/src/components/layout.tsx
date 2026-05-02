@@ -138,8 +138,8 @@ function SidebarPanel({ collapsed, onToggle, onClose }: SidebarPanelProps) {
       {/* ── User footer ───────────────────────────────────────────── */}
       <div className="border-t border-border shrink-0">
         <div
-          className={`py-3 flex items-center gap-2 overflow-hidden ${
-            collapsed && !isMobile ? "justify-center px-0" : "px-3"
+          className={`py-3 flex items-center overflow-hidden ${
+            collapsed && !isMobile ? "justify-center px-0 gap-0" : "px-3 gap-2"
           }`}
         >
           {/* Avatar — always visible */}

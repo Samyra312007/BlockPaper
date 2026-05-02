@@ -2,6 +2,20 @@ import { WebSocketServer } from "ws";
 import type { IncomingMessage, Server } from "node:http";
 import { getSession } from "./auth";
 import type { Room } from "./rooms";
+
+// ─── Feed broadcast ───────────────────────────────────────────────────────────
+// Set when startWsServer() runs; allows feed.ts to push to all connected clients
+
+let _broadcastAll: ((payload: unknown) => void) | null = null;
+let _getClientCount: (() => number) | null = null;
+
+export function broadcastFeedUpdate(items: unknown[]): void {
+  _broadcastAll?.({ type: "feed_update", items });
+}
+
+export function getConnectedClientCount(): number {
+  return _getClientCount?.() ?? 0;
+}
 import {
   getRoom,
   joinRoom,
@@ -35,6 +49,14 @@ function parseCookies(header: string): Record<string, string> {
 
 export function startWsServer(server: Server): void {
   const wss = new WebSocketServer({ noServer: true });
+
+  _broadcastAll = (payload) => {
+    const str = JSON.stringify(payload);
+    for (const client of wss.clients) {
+      if ((client as any).readyState === 1) (client as any).send(str);
+    }
+  };
+  _getClientCount = () => wss.clients.size;
 
   server.on("upgrade", (req: IncomingMessage, socket, head) => {
     const urlStr = req.url ?? "/";

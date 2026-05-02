@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useGetAccount } from "@workspace/api-client-react";
-import { Activity, LogOut, Briefcase, History, LineChart, Brain, Users, Trophy, FlaskConical, LayoutGrid, Gauge, Bell } from "lucide-react";
+import { Activity, LogOut, Briefcase, History, LineChart, Brain, Users, Trophy, FlaskConical, LayoutGrid, Gauge, Bell, Radio } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </Link>
             <Link href="/alerts" className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${location === '/alerts' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}>
               <span className="flex items-center gap-2"><Bell className="h-4 w-4"/> Alerts</span>
+            </Link>
+            <Link href="/feed" className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${location === '/feed' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}>
+              <span className="flex items-center gap-2"><Radio className="h-4 w-4"/> Feed</span>
             </Link>
           </nav>
         </div>

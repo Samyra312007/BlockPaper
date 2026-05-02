@@ -9,6 +9,7 @@ import { startWeeklyMonitor } from "./lib/gamification";
 import { seedDailyCandles } from "./lib/candles";
 import { startSentimentMonitor } from "./routes/sentiment";
 import { startAlertMonitor } from "./lib/alert-monitor";
+import { startFeedBroadcaster } from "./lib/feed";
 
 const rawPort = process.env["PORT"];
 
@@ -32,6 +33,7 @@ httpServer.listen(port, async () => {
   startSentinelMonitor();
   startSentimentMonitor();
   startAlertMonitor();
+  startFeedBroadcaster();
   startWeeklyMonitor();
 
   try {

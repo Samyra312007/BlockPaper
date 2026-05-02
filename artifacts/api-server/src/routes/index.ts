@@ -12,6 +12,7 @@ import backtestRouter from "./backtest";
 import heatmapRouter from "./heatmap";
 import sentimentRouter from "./sentiment";
 import alertsRouter from "./alerts";
+import feedRouter from "./feed";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(backtestRouter);
 router.use(heatmapRouter);
 router.use(sentimentRouter);
 router.use(alertsRouter);
+router.use(feedRouter);
 
 export default router;

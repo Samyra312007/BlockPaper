@@ -43,7 +43,7 @@ export function TradeForm({ symbol, defaultSide, defaultQuantity }: TradeFormPro
     if (side === "sell" && q > holding) { toast.error("Insufficient holdings"); return; }
 
     placeOrder.mutate({ data: { symbol, side, type, quantity: q, limitPrice: type === "limit" ? parseFloat(limitPrice) : undefined } }, {
-      onSuccess: (order) => {
+      onSuccess: (order: any) => {
         toast.success(`Order placed: ${side.toUpperCase()} ${q} ${symbol}`);
         setLastOrder({ id: order.id, qty: q, price: order.price });
         setLastTxHash(null);
@@ -52,6 +52,21 @@ export function TradeForm({ symbol, defaultSide, defaultQuantity }: TradeFormPro
         queryClient.invalidateQueries({ queryKey: getGetAccountQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetPortfolioQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetOrdersQueryKey() });
+        queryClient.invalidateQueries({ queryKey: ["gamification"] });
+
+        const gam = order.gamification as { newBadges: string[]; questsCompleted: string[]; totalReward: number } | undefined;
+        if (gam) {
+          const QUEST_NAMES: Record<string, string> = { trades_3: "Market Maker", return_5: "Bull Market", assets_3: "Diversifier" };
+          const BADGE_NAMES: Record<string, string> = { first_blood: "First Blood 🩸", paper_hands: "Paper Hands 📄", diamond_hands: "Diamond Hands 💎", hat_trick: "Hat Trick 🎯", bull_run: "Bull Run 🐂", weekly_champ: "Weekly Champion 🏆" };
+          for (const qId of gam.questsCompleted) {
+            const name = QUEST_NAMES[qId] ?? qId;
+            toast.success(`Quest complete: ${name}!`, { description: `+$${gam.totalReward} virtual dollars credited`, duration: 5000 });
+          }
+          for (const bId of gam.newBadges) {
+            const name = BADGE_NAMES[bId] ?? bId;
+            toast.success(`Badge unlocked: ${name}`, { description: "Visit Quests to see your badges", duration: 6000 });
+          }
+        }
       },
       onError: (err: any) => toast.error(err?.error || "Failed to place order"),
     });

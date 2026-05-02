@@ -5,6 +5,7 @@ import { startPriceSimulation } from "./lib/prices";
 import { seedCandles } from "./lib/candles";
 import { startSentinelMonitor } from "./routes/sentinel";
 import { startWsServer } from "./lib/ws-server";
+import { startWeeklyMonitor } from "./lib/gamification";
 
 const rawPort = process.env["PORT"];
 
@@ -26,6 +27,7 @@ httpServer.listen(port, async () => {
 
   startPriceSimulation();
   startSentinelMonitor();
+  startWeeklyMonitor();
 
   try {
     await seedCandles();

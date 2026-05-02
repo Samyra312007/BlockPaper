@@ -3,3 +3,4 @@ export * from "./trading";
 export * from "./conversations";
 export * from "./messages";
 export * from "./wallet";
+export * from "./gamification";

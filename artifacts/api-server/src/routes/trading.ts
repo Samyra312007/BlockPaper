@@ -5,6 +5,7 @@ import { eq, and, desc } from "drizzle-orm";
 import { getPrice, getAllPrices } from "../lib/prices";
 import { PlaceOrderBody } from "@workspace/api-zod";
 import { notifyRoomTrade } from "../lib/rooms";
+import { onTradeCompleted, enrollInWeeklyContest, getUserPortfolioValue } from "../lib/gamification";
 
 const router = Router();
 
@@ -286,12 +287,22 @@ router.post("/orders", async (req, res) => {
     })
     .returning();
 
+  let gamification: { newBadges: string[]; questsCompleted: string[]; totalReward: number } | undefined;
+
   if (type === "market" && orderStatus === "filled") {
     const displayName =
       [req.user!.firstName, req.user!.lastName].filter(Boolean).join(" ") ||
       req.user!.email ||
       "Trader";
     notifyRoomTrade(userId, displayName, sym, side, quantity, executionPrice);
+
+    // Run gamification hooks (portfolio value after the trade)
+    const portfolioValue = await getUserPortfolioValue(userId);
+    const [gamResult] = await Promise.all([
+      onTradeCompleted(userId, sym, side as "buy" | "sell", filledAt!, portfolioValue),
+      enrollInWeeklyContest(userId, portfolioValue),
+    ]);
+    gamification = gamResult;
   }
 
   res.status(201).json({
@@ -299,6 +310,7 @@ router.post("/orders", async (req, res) => {
     quantity: Number(order.quantity),
     price: Number(order.price),
     limitPrice: order.limitPrice ? Number(order.limitPrice) : null,
+    gamification,
   });
 });
 

@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useGetAccount } from "@workspace/api-client-react";
-import { Activity, LogOut, Briefcase, History, LineChart, Brain, Users } from "lucide-react";
+import { Activity, LogOut, Briefcase, History, LineChart, Brain, Users, Trophy } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </Link>
             <Link href="/rooms" className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${location === '/rooms' || location.startsWith('/room/') ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}>
               <span className="flex items-center gap-2"><Users className="h-4 w-4"/> Rooms</span>
+            </Link>
+            <Link href="/quests" className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${location === '/quests' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}>
+              <span className="flex items-center gap-2"><Trophy className="h-4 w-4"/> Quests</span>
             </Link>
           </nav>
         </div>

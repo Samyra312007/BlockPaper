@@ -23,7 +23,10 @@ import type {
   AuthUserEnvelope,
   BeginBrowserLoginParams,
   Candle,
+  ChainTx,
+  ChainTxResult,
   ErrorEnvelope,
+  ExecuteOnChainRequest,
   GetCandleDataParams,
   GetOrdersParams,
   HandleBrowserLoginCallbackParams,
@@ -37,6 +40,10 @@ import type {
   Portfolio,
   PortfolioSummary,
   SignalsResponse,
+  WalletNonceRequest,
+  WalletNonceResponse,
+  WalletVerifyRequest,
+  WalletVerifyResponse,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -1313,6 +1320,339 @@ export const useCancelOrder = <
 > => {
   return useMutation(getCancelOrderMutationOptions(options));
 };
+
+/**
+ * @summary Request a sign-in nonce for a wallet address
+ */
+export const getRequestWalletNonceUrl = () => {
+  return `/api/wallet/nonce`;
+};
+
+export const requestWalletNonce = async (
+  walletNonceRequest: WalletNonceRequest,
+  options?: RequestInit,
+): Promise<WalletNonceResponse> => {
+  return customFetch<WalletNonceResponse>(getRequestWalletNonceUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(walletNonceRequest),
+  });
+};
+
+export const getRequestWalletNonceMutationOptions = <
+  TError = ErrorType<ErrorEnvelope>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestWalletNonce>>,
+    TError,
+    { data: BodyType<WalletNonceRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestWalletNonce>>,
+  TError,
+  { data: BodyType<WalletNonceRequest> },
+  TContext
+> => {
+  const mutationKey = ["requestWalletNonce"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestWalletNonce>>,
+    { data: BodyType<WalletNonceRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return requestWalletNonce(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestWalletNonceMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestWalletNonce>>
+>;
+export type RequestWalletNonceMutationBody = BodyType<WalletNonceRequest>;
+export type RequestWalletNonceMutationError = ErrorType<ErrorEnvelope>;
+
+/**
+ * @summary Request a sign-in nonce for a wallet address
+ */
+export const useRequestWalletNonce = <
+  TError = ErrorType<ErrorEnvelope>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestWalletNonce>>,
+    TError,
+    { data: BodyType<WalletNonceRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof requestWalletNonce>>,
+  TError,
+  { data: BodyType<WalletNonceRequest> },
+  TContext
+> => {
+  return useMutation(getRequestWalletNonceMutationOptions(options));
+};
+
+/**
+ * @summary Verify signed nonce and link wallet to session
+ */
+export const getVerifyWalletSignatureUrl = () => {
+  return `/api/wallet/verify`;
+};
+
+export const verifyWalletSignature = async (
+  walletVerifyRequest: WalletVerifyRequest,
+  options?: RequestInit,
+): Promise<WalletVerifyResponse> => {
+  return customFetch<WalletVerifyResponse>(getVerifyWalletSignatureUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(walletVerifyRequest),
+  });
+};
+
+export const getVerifyWalletSignatureMutationOptions = <
+  TError = ErrorType<ErrorEnvelope>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof verifyWalletSignature>>,
+    TError,
+    { data: BodyType<WalletVerifyRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof verifyWalletSignature>>,
+  TError,
+  { data: BodyType<WalletVerifyRequest> },
+  TContext
+> => {
+  const mutationKey = ["verifyWalletSignature"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof verifyWalletSignature>>,
+    { data: BodyType<WalletVerifyRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return verifyWalletSignature(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type VerifyWalletSignatureMutationResult = NonNullable<
+  Awaited<ReturnType<typeof verifyWalletSignature>>
+>;
+export type VerifyWalletSignatureMutationBody = BodyType<WalletVerifyRequest>;
+export type VerifyWalletSignatureMutationError = ErrorType<ErrorEnvelope>;
+
+/**
+ * @summary Verify signed nonce and link wallet to session
+ */
+export const useVerifyWalletSignature = <
+  TError = ErrorType<ErrorEnvelope>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof verifyWalletSignature>>,
+    TError,
+    { data: BodyType<WalletVerifyRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof verifyWalletSignature>>,
+  TError,
+  { data: BodyType<WalletVerifyRequest> },
+  TContext
+> => {
+  return useMutation(getVerifyWalletSignatureMutationOptions(options));
+};
+
+/**
+ * @summary Simulate on-chain trade execution
+ */
+export const getExecuteOnChainUrl = () => {
+  return `/api/wallet/execute`;
+};
+
+export const executeOnChain = async (
+  executeOnChainRequest: ExecuteOnChainRequest,
+  options?: RequestInit,
+): Promise<ChainTxResult> => {
+  return customFetch<ChainTxResult>(getExecuteOnChainUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(executeOnChainRequest),
+  });
+};
+
+export const getExecuteOnChainMutationOptions = <
+  TError = ErrorType<ErrorEnvelope>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof executeOnChain>>,
+    TError,
+    { data: BodyType<ExecuteOnChainRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof executeOnChain>>,
+  TError,
+  { data: BodyType<ExecuteOnChainRequest> },
+  TContext
+> => {
+  const mutationKey = ["executeOnChain"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof executeOnChain>>,
+    { data: BodyType<ExecuteOnChainRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return executeOnChain(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ExecuteOnChainMutationResult = NonNullable<
+  Awaited<ReturnType<typeof executeOnChain>>
+>;
+export type ExecuteOnChainMutationBody = BodyType<ExecuteOnChainRequest>;
+export type ExecuteOnChainMutationError = ErrorType<ErrorEnvelope>;
+
+/**
+ * @summary Simulate on-chain trade execution
+ */
+export const useExecuteOnChain = <
+  TError = ErrorType<ErrorEnvelope>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof executeOnChain>>,
+    TError,
+    { data: BodyType<ExecuteOnChainRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof executeOnChain>>,
+  TError,
+  { data: BodyType<ExecuteOnChainRequest> },
+  TContext
+> => {
+  return useMutation(getExecuteOnChainMutationOptions(options));
+};
+
+/**
+ * @summary Get on-chain transaction history for the user
+ */
+export const getGetChainTransactionsUrl = () => {
+  return `/api/wallet/transactions`;
+};
+
+export const getChainTransactions = async (
+  options?: RequestInit,
+): Promise<ChainTx[]> => {
+  return customFetch<ChainTx[]>(getGetChainTransactionsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetChainTransactionsQueryKey = () => {
+  return [`/api/wallet/transactions`] as const;
+};
+
+export const getGetChainTransactionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getChainTransactions>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getChainTransactions>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetChainTransactionsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getChainTransactions>>
+  > = ({ signal }) => getChainTransactions({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getChainTransactions>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetChainTransactionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getChainTransactions>>
+>;
+export type GetChainTransactionsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get on-chain transaction history for the user
+ */
+
+export function useGetChainTransactions<
+  TData = Awaited<ReturnType<typeof getChainTransactions>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getChainTransactions>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetChainTransactionsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * @summary Get AI-generated trading signals for all assets

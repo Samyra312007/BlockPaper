@@ -5,6 +5,7 @@ import { Activity, LogOut, Briefcase, History, LineChart, Brain } from "lucide-r
 import { formatCurrency } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { WalletButton } from "@/components/wallet/wallet-button";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
@@ -36,12 +37,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 font-medium">
             DEMO MODE &mdash; Paper Trading
           </Badge>
+
+          <WalletButton />
           
-          <div className="flex items-center gap-4 border-l border-border pl-4">
+          <div className="flex items-center gap-3 border-l border-border pl-3">
             <div className="flex flex-col items-end">
               <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Cash Balance</span>
               <span className="text-sm font-mono font-medium">

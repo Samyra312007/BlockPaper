@@ -251,6 +251,71 @@ export const CancelOrderResponse = zod.object({
 });
 
 /**
+ * @summary Request a sign-in nonce for a wallet address
+ */
+export const RequestWalletNonceBody = zod.object({
+  address: zod.string().describe("EIP-55 checksummed Ethereum address"),
+});
+
+export const RequestWalletNonceResponse = zod.object({
+  nonce: zod.string(),
+  message: zod.string().describe("The full message the user must sign"),
+});
+
+/**
+ * @summary Verify signed nonce and link wallet to session
+ */
+export const VerifyWalletSignatureBody = zod.object({
+  address: zod.string(),
+  signature: zod.string(),
+});
+
+export const VerifyWalletSignatureResponse = zod.object({
+  address: zod.string(),
+  ethBalance: zod.string().describe("Mock ETH balance string"),
+  verified: zod.boolean(),
+});
+
+/**
+ * @summary Simulate on-chain trade execution
+ */
+export const ExecuteOnChainBody = zod.object({
+  orderId: zod.number(),
+  symbol: zod.string(),
+  side: zod.enum(["buy", "sell"]),
+  quantity: zod.number(),
+  price: zod.number(),
+});
+
+export const ExecuteOnChainResponse = zod.object({
+  txHash: zod.string(),
+  blockNumber: zod.number(),
+  gasUsed: zod.string(),
+  status: zod.enum(["confirmed", "failed"]),
+  executedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Get on-chain transaction history for the user
+ */
+export const GetChainTransactionsResponseItem = zod.object({
+  id: zod.number(),
+  walletAddress: zod.string(),
+  txHash: zod.string(),
+  symbol: zod.string(),
+  side: zod.string(),
+  quantity: zod.string(),
+  price: zod.string(),
+  status: zod.string(),
+  blockNumber: zod.number(),
+  gasUsed: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+export const GetChainTransactionsResponse = zod.array(
+  GetChainTransactionsResponseItem,
+);
+
+/**
  * @summary Get AI-generated trading signals for all assets
  */
 export const GetAiSignalsHeader = zod.object({

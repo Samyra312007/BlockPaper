@@ -4,6 +4,7 @@ import authRouter from "./auth";
 import pricesRouter from "./prices";
 import tradingRouter from "./trading";
 import aiRouter from "./ai";
+import walletRouter from "./wallet";
 
 const router: IRouter = Router();
 
@@ -12,5 +13,6 @@ router.use(authRouter);
 router.use(pricesRouter);
 router.use(tradingRouter);
 router.use(aiRouter);
+router.use(walletRouter);
 
 export default router;

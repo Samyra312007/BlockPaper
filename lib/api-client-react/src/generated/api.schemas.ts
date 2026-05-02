@@ -251,6 +251,75 @@ export interface AiChatRequest {
   messages: AiChatMessage[];
 }
 
+export interface WalletNonceRequest {
+  /** EIP-55 checksummed Ethereum address */
+  address: string;
+}
+
+export interface WalletNonceResponse {
+  nonce: string;
+  /** The full message the user must sign */
+  message: string;
+}
+
+export interface WalletVerifyRequest {
+  address: string;
+  signature: string;
+}
+
+export interface WalletVerifyResponse {
+  address: string;
+  /** Mock ETH balance string */
+  ethBalance: string;
+  verified: boolean;
+}
+
+export type ExecuteOnChainRequestSide =
+  (typeof ExecuteOnChainRequestSide)[keyof typeof ExecuteOnChainRequestSide];
+
+export const ExecuteOnChainRequestSide = {
+  buy: "buy",
+  sell: "sell",
+} as const;
+
+export interface ExecuteOnChainRequest {
+  orderId: number;
+  symbol: string;
+  side: ExecuteOnChainRequestSide;
+  quantity: number;
+  price: number;
+}
+
+export type ChainTxResultStatus =
+  (typeof ChainTxResultStatus)[keyof typeof ChainTxResultStatus];
+
+export const ChainTxResultStatus = {
+  confirmed: "confirmed",
+  failed: "failed",
+} as const;
+
+export interface ChainTxResult {
+  txHash: string;
+  blockNumber: number;
+  gasUsed: string;
+  status: ChainTxResultStatus;
+  executedAt: string;
+}
+
+export interface ChainTx {
+  id: number;
+  walletAddress: string;
+  txHash: string;
+  symbol: string;
+  side: string;
+  quantity: string;
+  price: string;
+  status: string;
+  blockNumber: number;
+  gasUsed: string;
+  createdAt: string;
+}
+
 /**
  * Opaque session token — Bearer <sid>.
  */

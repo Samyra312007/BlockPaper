@@ -20,6 +20,8 @@ tags:
     description: Trade order management
   - name: ai
     description: AI trading assistant
+  - name: wallet
+    description: Blockchain wallet connection and on-chain execution
 paths:
   /healthz:
     get:
@@ -336,6 +338,96 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
+
+  /wallet/nonce:
+    post:
+      operationId: requestWalletNonce
+      tags: [wallet]
+      summary: Request a sign-in nonce for a wallet address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletNonceRequest'
+      responses:
+        '200':
+          description: Nonce issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletNonceResponse'
+        '400':
+          description: Invalid address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /wallet/verify:
+    post:
+      operationId: verifyWalletSignature
+      tags: [wallet]
+      summary: Verify signed nonce and link wallet to session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletVerifyRequest'
+      responses:
+        '200':
+          description: Wallet verified and linked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletVerifyResponse'
+        '400':
+          description: Invalid signature or expired nonce
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /wallet/execute:
+    post:
+      operationId: executeOnChain
+      tags: [wallet]
+      summary: Simulate on-chain trade execution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteOnChainRequest'
+      responses:
+        '200':
+          description: Simulated transaction result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChainTxResult'
+        '400':
+          description: Invalid request or wallet not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /wallet/transactions:
+    get:
+      operationId: getChainTransactions
+      tags: [wallet]
+      summary: Get on-chain transaction history for the user
+      responses:
+        '200':
+          description: Transaction list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChainTx'
 
   /openai/signals:
     get:
@@ -755,3 +847,103 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AiChatMessage'
+
+    WalletNonceRequest:
+      type: object
+      required: [address]
+      properties:
+        address:
+          type: string
+          description: EIP-55 checksummed Ethereum address
+
+    WalletNonceResponse:
+      type: object
+      required: [nonce, message]
+      properties:
+        nonce:
+          type: string
+        message:
+          type: string
+          description: The full message the user must sign
+
+    WalletVerifyRequest:
+      type: object
+      required: [address, signature]
+      properties:
+        address:
+          type: string
+        signature:
+          type: string
+
+    WalletVerifyResponse:
+      type: object
+      required: [address, ethBalance, verified]
+      properties:
+        address:
+          type: string
+        ethBalance:
+          type: string
+          description: Mock ETH balance string
+        verified:
+          type: boolean
+
+    ExecuteOnChainRequest:
+      type: object
+      required: [orderId, symbol, side, quantity, price]
+      properties:
+        orderId:
+          type: integer
+        symbol:
+          type: string
+        side:
+          type: string
+          enum: [buy, sell]
+        quantity:
+          type: number
+        price:
+          type: number
+
+    ChainTxResult:
+      type: object
+      required: [txHash, blockNumber, gasUsed, status, executedAt]
+      properties:
+        txHash:
+          type: string
+        blockNumber:
+          type: integer
+        gasUsed:
+          type: string
+        status:
+          type: string
+          enum: [confirmed, failed]
+        executedAt:
+          type: string
+          format: date-time
+
+    ChainTx:
+      type: object
+      required: [id, walletAddress, txHash, symbol, side, quantity, price, status, blockNumber, gasUsed, createdAt]
+      properties:
+        id:
+          type: integer
+        walletAddress:
+          type: string
+        txHash:
+          type: string
+        symbol:
+          type: string
+        side:
+          type: string
+        quantity:
+          type: string
+        price:
+          type: string
+        status:
+          type: string
+        blockNumber:
+          type: integer
+        gasUsed:
+          type: string
+        createdAt:
+          type: string
+          format: date-time

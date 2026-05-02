@@ -55,6 +55,22 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - Routes: `/api/gamification/quests`, `/api/gamification/badges`, `/api/gamification/contest`
 - Frontend: `/quests` page (Daily Quests / Badges / Weekly Contest tabs)
 
+### Price Alert System
+- **DB tables**: `price_alerts` (active alerts), `alert_triggers` (fired history) — pushed via `pnpm --filter @workspace/db run push`
+- **Routes** (all require auth):
+  - `GET /api/alerts` — list user's active alerts
+  - `POST /api/alerts` — create alert (validates symbol, condition, price; enforces max 10 per user)
+  - `DELETE /api/alerts/:id` — soft-delete (sets active=false)
+  - `GET /api/alerts/history` — all triggered alerts for user, newest first, limit 50
+  - `GET /api/alerts/pending` — unacknowledged triggers (used by notification bell)
+  - `POST /api/alerts/acknowledge` — marks all pending triggers as acknowledged
+- **Alert Monitor** (`lib/alert-monitor.ts`): polls every 10s, loads all active alerts from DB, compares to live prices. One-time alerts deactivate after firing. Recurring alerts use a 5-minute in-memory cooldown per alert ID
+- **Notification Bell** (`components/notification-bell.tsx`): polls `/api/alerts/pending` every 10s, shows red badge with unread count, fires Web Notifications API browser alerts for newly seen trigger IDs (tracked via ref), dropdown shows recent triggers with "Trade →" links, "Mark all read" acknowledges all
+- **Alerts page** (`/alerts`):
+  - Active tab: create form (4 symbol buttons, above/below toggle, target price input, recurring slider toggle, max-10 guard), active alerts list with delete
+  - History tab: full trigger log with triggered price vs target, % difference, NEW badge for unread, "Trade X →" navigates to terminal with symbol pre-selected
+- **Max 10 active alerts** per user enforced both client-side (warning) and server-side (400 error)
+
 ### Market Sentiment Gauge
 - **Routes**: `GET /api/sentiment` (current data + history), `POST /api/sentiment/refresh-quote` (force new AI quote)
 - **Monitor**: `startSentimentMonitor()` fires every 30s, caches state in-memory

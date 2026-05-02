@@ -1,12 +1,13 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useGetAccount } from "@workspace/api-client-react";
-import { Activity, LogOut, Briefcase, History, LineChart, Brain, Users, Trophy, FlaskConical, LayoutGrid, Gauge } from "lucide-react";
+import { Activity, LogOut, Briefcase, History, LineChart, Brain, Users, Trophy, FlaskConical, LayoutGrid, Gauge, Bell } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { WalletButton } from "@/components/wallet/wallet-button";
 import { SentinelPill } from "@/components/sentinel-pill";
+import { NotificationBell } from "@/components/notification-bell";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
@@ -50,6 +51,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link href="/sentiment" className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${location === '/sentiment' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}>
               <span className="flex items-center gap-2"><Gauge className="h-4 w-4"/> Sentiment</span>
             </Link>
+            <Link href="/alerts" className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${location === '/alerts' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'}`}>
+              <span className="flex items-center gap-2"><Bell className="h-4 w-4"/> Alerts</span>
+            </Link>
           </nav>
         </div>
 
@@ -61,7 +65,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </Badge>
 
           <WalletButton />
-          
+          <NotificationBell />
+
           <div className="flex items-center gap-3 border-l border-border pl-3">
             <div className="flex flex-col items-end">
               <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Cash Balance</span>

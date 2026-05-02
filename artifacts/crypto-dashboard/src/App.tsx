@@ -16,6 +16,7 @@ import Quests from "@/pages/quests";
 import Backtest from "@/pages/backtest";
 import Heatmap from "@/pages/heatmap";
 import SentimentPage from "@/pages/sentiment";
+import AlertsPage from "@/pages/alerts";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/backtest" component={() => <ProtectedRoute component={Backtest} />} />
       <Route path="/heatmap" component={() => <ProtectedRoute component={Heatmap} />} />
       <Route path="/sentiment" component={() => <ProtectedRoute component={SentimentPage} />} />
+      <Route path="/alerts" component={() => <ProtectedRoute component={AlertsPage} />} />
       <Route component={NotFound} />
     </Switch>
   );

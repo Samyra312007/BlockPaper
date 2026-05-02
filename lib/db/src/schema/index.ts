@@ -4,3 +4,4 @@ export * from "./conversations";
 export * from "./messages";
 export * from "./wallet";
 export * from "./gamification";
+export * from "./alerts";

@@ -8,6 +8,7 @@ import { startWsServer } from "./lib/ws-server";
 import { startWeeklyMonitor } from "./lib/gamification";
 import { seedDailyCandles } from "./lib/candles";
 import { startSentimentMonitor } from "./routes/sentiment";
+import { startAlertMonitor } from "./lib/alert-monitor";
 
 const rawPort = process.env["PORT"];
 
@@ -30,6 +31,7 @@ httpServer.listen(port, async () => {
   startPriceSimulation();
   startSentinelMonitor();
   startSentimentMonitor();
+  startAlertMonitor();
   startWeeklyMonitor();
 
   try {

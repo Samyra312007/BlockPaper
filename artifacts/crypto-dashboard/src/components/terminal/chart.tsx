@@ -21,6 +21,7 @@ export function Chart({ symbol }: { symbol: string }) {
       layout: {
         background: { type: ColorType.Solid, color: "#0d1117" },
         textColor: "#8b949e",
+        attributionLogo: false,
       },
       grid: {
         vertLines: { color: "#21262d" },

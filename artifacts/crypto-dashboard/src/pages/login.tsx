@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useAuth } from "@workspace/replit-auth-web";
 import { Activity, ChevronRight, ChevronDown, ArrowRight } from "lucide-react";
 
 // ─── Particle Network Canvas ──────────────────────────────────────────────────
@@ -234,7 +233,6 @@ function MockPanel() {
 // ─── Landing Page ─────────────────────────────────────────────────────────────
 
 export default function Login() {
-  const { login, isLoading } = useAuth();
   const typed = useTyping();
   const heroRef = useRef<HTMLDivElement>(null);
   const [py, setPy] = useState(0);
@@ -293,14 +291,13 @@ export default function Login() {
 
           {/* CTA row */}
           <div className="bp-cta flex flex-col sm:flex-row gap-3 items-center justify-center pt-1">
-            <button
-              onClick={login}
-              disabled={isLoading}
-              className="bp-cta-primary group flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold px-8 py-3.5 rounded-xl text-base transition-all duration-300 disabled:opacity-50 shadow-lg shadow-blue-900/50"
+            <a
+              href="/signup"
+              className="bp-cta-primary group flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold px-8 py-3.5 rounded-xl text-base transition-all duration-300 shadow-lg shadow-blue-900/50"
             >
-              {isLoading ? "Authenticating…" : "Start Paper Trading"}
+              Start Paper Trading
               <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </a>
           </div>
 
           <p className="bp-cta text-[11px] text-white/25 pt-1 tracking-wide">
@@ -425,14 +422,13 @@ export default function Login() {
             <p className="relative text-white/45 mb-8 text-base">
               Join BlockPaper and start your paper trading journey today — completely free.
             </p>
-            <button
-              onClick={login}
-              disabled={isLoading}
-              className="bp-cta-primary group relative inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold px-10 py-4 rounded-xl text-lg transition-all duration-300 disabled:opacity-50 shadow-xl shadow-blue-900/40"
+            <a
+              href="/signup"
+              className="bp-cta-primary group relative inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold px-10 py-4 rounded-xl text-lg transition-all duration-300 shadow-xl shadow-blue-900/40"
             >
-              {isLoading ? "Loading…" : "Get Started Free"}
+              Get Started Free
               <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </a>
           </div>
         </Reveal>
       </section>

@@ -1,14 +1,17 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@workspace/replit-auth-web";
+import { useEffect } from "react";
 import NotFound from "@/pages/not-found";
 
 import Terminal from "@/pages/terminal";
 import Portfolio from "@/pages/portfolio";
 import History from "@/pages/history";
 import Login from "@/pages/login";
+import SignIn from "@/pages/signin";
+import SignUp from "@/pages/signup";
 import AiAssistant from "@/pages/ai-assistant";
 import RoomPage from "@/pages/room";
 import RoomsLobby from "@/pages/rooms-lobby";
@@ -21,24 +24,63 @@ import FeedPage from "@/pages/feed";
 
 const queryClient = new QueryClient();
 
-function ProtectedRoute({ component: Component, ...rest }: { component: any, [key: string]: any }) {
+function RedirectTo({ to }: { to: string }) {
+  const [, setLocation] = useLocation();
+  useEffect(() => {
+    setLocation(to);
+  }, [to, setLocation]);
+  return null;
+}
+
+function ProtectedRoute({
+  component: Component,
+  showLanding = false,
+  ...rest
+}: {
+  component: React.ComponentType<Record<string, unknown>>;
+  showLanding?: boolean;
+  [key: string]: unknown;
+}) {
   const { isAuthenticated, isLoading } = useAuth();
-  
+
   if (isLoading) {
-    return <div className="min-h-screen bg-background flex items-center justify-center text-foreground font-mono">Loading Terminal...</div>;
+    return (
+      <div className="min-h-screen bg-[#070b12] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
-  
+
   if (!isAuthenticated) {
-    return <Login />;
+    if (showLanding) return <Login />;
+    return <RedirectTo to="/signin" />;
   }
-  
-  return <Component {...rest} />;
+
+  return <Component {...(rest as Record<string, unknown>)} />;
+}
+
+function PublicOnlyRoute({ component: Component }: { component: React.ComponentType }) {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#070b12] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (isAuthenticated) return <RedirectTo to="/" />;
+
+  return <Component />;
 }
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={() => <ProtectedRoute component={Terminal} />} />
+      <Route path="/signin" component={() => <PublicOnlyRoute component={SignIn} />} />
+      <Route path="/signup" component={() => <PublicOnlyRoute component={SignUp} />} />
+      <Route path="/" component={() => <ProtectedRoute component={Terminal} showLanding />} />
       <Route path="/portfolio" component={() => <ProtectedRoute component={Portfolio} />} />
       <Route path="/history" component={() => <ProtectedRoute component={History} />} />
       <Route path="/ai" component={() => <ProtectedRoute component={AiAssistant} />} />

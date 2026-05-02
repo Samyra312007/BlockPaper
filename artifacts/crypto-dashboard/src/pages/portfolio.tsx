@@ -56,8 +56,8 @@ export default function Portfolio() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
           <Card className="bg-card lg:col-span-2 flex flex-col">
             <CardHeader><CardTitle className="text-lg">Holdings</CardTitle></CardHeader>
-            <CardContent className="flex-1 p-0">
-              <table className="w-full text-sm text-left">
+            <CardContent className="flex-1 p-0 overflow-x-auto">
+              <table className="w-full min-w-[560px] text-sm text-left">
                 <thead className="text-xs text-muted-foreground bg-secondary/50 border-y border-border">
                   <tr>
                     <th className="font-medium px-4 py-3">Asset</th>

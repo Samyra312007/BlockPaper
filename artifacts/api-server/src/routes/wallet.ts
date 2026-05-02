@@ -56,7 +56,7 @@ router.post("/wallet/nonce", async (req, res) => {
     expiresAt,
   });
 
-  const message = `CryptoDesk wants to verify your wallet ownership.\n\nNonce: ${nonce}\nExpires: ${expiresAt.toISOString()}`;
+  const message = `BlockPaper wants to verify your wallet ownership.\n\nNonce: ${nonce}\nExpires: ${expiresAt.toISOString()}`;
 
   res.json({ nonce, message });
 });
@@ -96,7 +96,7 @@ router.post("/wallet/verify", async (req, res) => {
     return;
   }
 
-  const message = `CryptoDesk wants to verify your wallet ownership.\n\nNonce: ${nonceRow.nonce}\nExpires: ${nonceRow.expiresAt.toISOString()}`;
+  const message = `BlockPaper wants to verify your wallet ownership.\n\nNonce: ${nonceRow.nonce}\nExpires: ${nonceRow.expiresAt.toISOString()}`;
 
   try {
     const valid = await verifyMessage({

@@ -218,7 +218,7 @@ router.post("/openai/chat", async (req, res) => {
     .map((p) => `${p.symbol}: $${p.price.toFixed(2)} (${p.changePercent24h >= 0 ? "+" : ""}${p.changePercent24h.toFixed(2)}% 24h)`)
     .join(", ");
 
-  const systemPrompt = `You are an AI trading assistant for CryptoDesk, a paper trading platform. You help users make informed trading decisions in demo mode with $10,000 virtual balance. Be concise, insightful, and always remind users this is paper trading.
+  const systemPrompt = `You are an AI trading assistant for BlockPaper, a crypto trading platform. You help users make informed trading decisions with their virtual balance. Be concise, insightful, and data-driven.
 
 Current market prices (simulated): ${priceContext}
 Current time: ${new Date().toISOString()}

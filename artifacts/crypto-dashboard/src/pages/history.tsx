@@ -90,7 +90,7 @@ export default function History() {
           <TabsContent value="orders" className="flex-1 min-h-0 mt-0">
             <Card className="flex-1 flex flex-col min-h-0 bg-card h-full">
               <div className="flex-1 overflow-auto">
-                <table className="w-full text-sm text-left">
+                <table className="w-full min-w-[640px] text-sm text-left">
                   <thead className="text-xs text-muted-foreground bg-secondary/50 border-b border-border sticky top-0">
                     <tr>
                       <th className="font-medium px-6 py-3">Order ID</th>

@@ -15,6 +15,7 @@ import RoomsLobby from "@/pages/rooms-lobby";
 import Quests from "@/pages/quests";
 import Backtest from "@/pages/backtest";
 import Heatmap from "@/pages/heatmap";
+import SentimentPage from "@/pages/sentiment";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ function Router() {
       <Route path="/quests" component={() => <ProtectedRoute component={Quests} />} />
       <Route path="/backtest" component={() => <ProtectedRoute component={Backtest} />} />
       <Route path="/heatmap" component={() => <ProtectedRoute component={Heatmap} />} />
+      <Route path="/sentiment" component={() => <ProtectedRoute component={SentimentPage} />} />
       <Route component={NotFound} />
     </Switch>
   );

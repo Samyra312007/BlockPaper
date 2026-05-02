@@ -10,6 +10,7 @@ import roomsRouter from "./rooms";
 import gamificationRouter from "./gamification";
 import backtestRouter from "./backtest";
 import heatmapRouter from "./heatmap";
+import sentimentRouter from "./sentiment";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(roomsRouter);
 router.use(gamificationRouter);
 router.use(backtestRouter);
 router.use(heatmapRouter);
+router.use(sentimentRouter);
 
 export default router;

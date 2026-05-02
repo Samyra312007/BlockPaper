@@ -78,7 +78,7 @@ function SidebarPanel({ collapsed, onToggle, onClose }: SidebarPanelProps) {
       {!isMobile && (
         <button
           onClick={onToggle}
-          className={`w-full flex items-center h-8 border-b border-border/60 shrink-0 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors ${
+          className={`w-full flex items-center h-10 border-b border-border/60 shrink-0 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors ${
             collapsed ? "justify-center px-0" : "justify-end px-3"
           }`}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}

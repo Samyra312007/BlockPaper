@@ -6,11 +6,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPrice } from "@/lib/format";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { Zap } from "lucide-react";
 
-export function TradeForm({ symbol }: { symbol: string }) {
-  const [side, setSide] = useState<"buy" | "sell">("buy");
+interface TradeFormProps {
+  symbol: string;
+  defaultSide?: "buy" | "sell";
+  defaultQuantity?: number;
+}
+
+export function TradeForm({ symbol, defaultSide, defaultQuantity }: TradeFormProps) {
+  const [side, setSide] = useState<"buy" | "sell">(defaultSide ?? "buy");
   const [type, setType] = useState<"market" | "limit">("market");
-  const [quantity, setQuantity] = useState("");
+  const [quantity, setQuantity] = useState(defaultQuantity ? String(defaultQuantity) : "");
   const [limitPrice, setLimitPrice] = useState("");
 
   const queryClient = useQueryClient();
@@ -23,6 +30,8 @@ export function TradeForm({ symbol }: { symbol: string }) {
   const holding = portfolio?.holdings.find(h => h.symbol === symbol)?.quantity || 0;
   
   const estimatedTotal = parseFloat(quantity || "0") * (type === "market" ? currentPrice : parseFloat(limitPrice || "0"));
+
+  const isAiPrefilled = !!(defaultSide && defaultQuantity);
 
   const onSubmit = () => {
     const q = parseFloat(quantity);
@@ -66,7 +75,14 @@ export function TradeForm({ symbol }: { symbol: string }) {
     <div className="flex flex-col h-full bg-card">
       <div className="p-4 border-b border-border font-medium flex justify-between items-center">
         <span>Order Ticket</span>
-        <span className="text-sm font-mono text-muted-foreground">{symbol}</span>
+        <div className="flex items-center gap-2">
+          {isAiPrefilled && (
+            <span className="flex items-center gap-1 text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+              <Zap className="h-2.5 w-2.5" /> AI Signal
+            </span>
+          )}
+          <span className="text-sm font-mono text-muted-foreground">{symbol}</span>
+        </div>
       </div>
       
       <div className="p-4 flex-1 flex flex-col space-y-6">

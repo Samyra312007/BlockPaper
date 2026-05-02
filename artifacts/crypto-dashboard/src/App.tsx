@@ -9,6 +9,7 @@ import Terminal from "@/pages/terminal";
 import Portfolio from "@/pages/portfolio";
 import History from "@/pages/history";
 import Login from "@/pages/login";
+import AiAssistant from "@/pages/ai-assistant";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/" component={() => <ProtectedRoute component={Terminal} />} />
       <Route path="/portfolio" component={() => <ProtectedRoute component={Portfolio} />} />
       <Route path="/history" component={() => <ProtectedRoute component={History} />} />
+      <Route path="/ai" component={() => <ProtectedRoute component={AiAssistant} />} />
       <Route component={NotFound} />
     </Switch>
   );

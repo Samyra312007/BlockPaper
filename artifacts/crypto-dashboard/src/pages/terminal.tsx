@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGetPrices, getGetPricesQueryKey, useGetOrders, getGetOrdersQueryKey, useGetPortfolio, getGetPortfolioQueryKey } from "@workspace/api-client-react";
 import { Layout } from "@/components/layout";
 import { Ticker } from "@/components/terminal/ticker";
@@ -49,10 +49,32 @@ function HoldingSummary({ symbol }: { symbol: string }) {
   );
 }
 
+function useQueryParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    symbol: params.get("symbol")?.toUpperCase() ?? null,
+    side: params.get("side") as "buy" | "sell" | null,
+    quantity: params.get("quantity") ? parseFloat(params.get("quantity")!) : null,
+    price: params.get("price") ? parseFloat(params.get("price")!) : null,
+  };
+}
+
 export default function Terminal() {
-  const [symbol, setSymbol] = useState("BTC");
+  const qp = useQueryParams();
+  const initialSymbol = qp.symbol && ASSETS.includes(qp.symbol) ? qp.symbol : "BTC";
+
+  const [symbol, setSymbol] = useState(initialSymbol);
   const { data: prices } = useGetPrices({ query: { queryKey: getGetPricesQueryKey() } });
   const { data: orders } = useGetOrders({ limit: 10, symbol }, { query: { queryKey: getGetOrdersQueryKey({ limit: 10, symbol }) } });
+
+  // If AI one-click trade arrives via query params, switch to correct symbol
+  useEffect(() => {
+    if (qp.symbol && ASSETS.includes(qp.symbol)) {
+      setSymbol(qp.symbol);
+    }
+  // Only run on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const currentAsset = prices?.find(p => p.symbol === symbol);
 
@@ -137,7 +159,11 @@ export default function Terminal() {
         {/* Right Panel */}
         <div className="w-[40%] flex flex-col shrink-0 border-l border-border">
           <div className="h-[55%] min-h-[400px]">
-            <TradeForm symbol={symbol} />
+            <TradeForm
+              symbol={symbol}
+              defaultSide={symbol === (qp.symbol ?? symbol) ? (qp.side ?? undefined) : undefined}
+              defaultQuantity={symbol === (qp.symbol ?? symbol) ? (qp.quantity ?? undefined) : undefined}
+            />
           </div>
           <div className="flex-1 border-t border-border bg-card flex flex-col">
             <div className="p-4 border-b border-border font-medium">Position</div>

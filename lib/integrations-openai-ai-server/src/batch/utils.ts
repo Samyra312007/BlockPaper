@@ -1,30 +1,8 @@
 import pLimit from "p-limit";
-import pRetry from "p-retry";
+import pRetry, { AbortError } from "p-retry";
 
 /**
  * Batch Processing Utilities
- *
- * Generic batch processing with built-in rate limiting and automatic retries.
- * Use for any task that requires processing multiple items through an LLM or external API.
- *
- * USAGE:
- * ```typescript
- * import { batchProcess } from "@workspace/integrations-openai-ai-server/batch";
- * import { openai } from "@workspace/integrations-openai-ai-server";
- *
- * const results = await batchProcess(
- *   artworks,
- *   async (artwork) => {
- *     const response = await openai.chat.completions.create({
- *       model: "gpt-5.4",
- *       messages: [{ role: "user", content: `Categorize: ${artwork.name}` }],
- *       response_format: { type: "json_object" },
- *     });
- *     return JSON.parse(response.choices[0]?.message?.content || "{}");
- *   },
- *   { concurrency: 2, retries: 5 }
- * );
- * ```
  */
 
 export interface BatchOptions {
@@ -74,7 +52,7 @@ export async function batchProcess<T, R>(
             if (isRateLimitError(error)) {
               throw error;
             }
-            throw new pRetry.AbortError(
+            throw new AbortError(
               error instanceof Error ? error : new Error(String(error))
             );
           }
@@ -114,7 +92,7 @@ export async function batchProcessWithSSE<T, R>(
           factor: 2,
           onFailedAttempt: (error) => {
             if (!isRateLimitError(error)) {
-              throw new pRetry.AbortError(
+              throw new AbortError(
                 error instanceof Error ? error : new Error(String(error))
               );
             }

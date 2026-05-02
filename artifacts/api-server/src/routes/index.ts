@@ -9,6 +9,7 @@ import sentinelRouter from "./sentinel";
 import roomsRouter from "./rooms";
 import gamificationRouter from "./gamification";
 import backtestRouter from "./backtest";
+import heatmapRouter from "./heatmap";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(sentinelRouter);
 router.use(roomsRouter);
 router.use(gamificationRouter);
 router.use(backtestRouter);
+router.use(heatmapRouter);
 
 export default router;

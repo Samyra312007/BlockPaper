@@ -55,6 +55,19 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - Routes: `/api/gamification/quests`, `/api/gamification/badges`, `/api/gamification/contest`
 - Frontend: `/quests` page (Daily Quests / Badges / Weekly Contest tabs)
 
+### Portfolio Heatmap
+- **Route**: `GET /api/heatmap` — returns enriched per-asset data including 7d change (from daily candles), allocation %, P&L per holding
+- **Frontend**: `/heatmap` — responsive 4-col grid (lg) / 3-col (md) / 2-col (sm)
+- **Heat Intensity Toggle**: 24h Change | 7d Change | Total P&L — switches which metric drives the tile color AND the displayed percentage
+- **Color spectrum** (8 buckets): Deep Red (≤−10%) → Orange (−10→−5%) → Orange-Amber (−5→−2%) → Yellow (−2→0%) → Mild Green (0→+2%) → Light Green (+2→+5%) → Deep Green (+5→+10%) → Neon Green (≥+10%)
+- Colors computed as inline HSL styles (saturation and lightness scale with intensity); border glow on hover via JavaScript mouseenter/leave
+- **Hover tooltip**: shows price, 24h, 7d, high, low, volume, and full position details (avg cost, unrealized P&L) if user holds the asset
+- **Click tile** → navigates to `/?symbol=BTC` (terminal page already reads `?symbol=` query param)
+- **Allocation bar**: visible only on tiles where user holds a position; shows % of total portfolio value + holding value + quantity
+- **Summary row**: compact per-asset strip below the grid for quick scanning
+- **Color legend**: always visible at the bottom, showing all 8 heat buckets
+- Auto-refreshes every 10 seconds via React Query `refetchInterval`
+
 ### Backtesting Engine
 - **Data**: 111 daily candles per symbol (BTC/ETH/SOL/BNB) seeded at startup via `seedDailyCandles()`
 - **Strategies**: SMA Crossover, RSI, Bollinger Bands — pure-math indicators, no dependencies

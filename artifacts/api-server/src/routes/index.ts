@@ -6,6 +6,7 @@ import tradingRouter from "./trading";
 import aiRouter from "./ai";
 import walletRouter from "./wallet";
 import sentinelRouter from "./sentinel";
+import roomsRouter from "./rooms";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(tradingRouter);
 router.use(aiRouter);
 router.use(walletRouter);
 router.use(sentinelRouter);
+router.use(roomsRouter);
 
 export default router;

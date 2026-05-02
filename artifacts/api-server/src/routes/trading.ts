@@ -4,6 +4,7 @@ import { accountsTable, ordersTable, holdingsTable } from "@workspace/db";
 import { eq, and, desc } from "drizzle-orm";
 import { getPrice, getAllPrices } from "../lib/prices";
 import { PlaceOrderBody } from "@workspace/api-zod";
+import { notifyRoomTrade } from "../lib/rooms";
 
 const router = Router();
 
@@ -284,6 +285,14 @@ router.post("/orders", async (req, res) => {
       filledAt,
     })
     .returning();
+
+  if (type === "market" && orderStatus === "filled") {
+    const displayName =
+      [req.user!.firstName, req.user!.lastName].filter(Boolean).join(" ") ||
+      req.user!.email ||
+      "Trader";
+    notifyRoomTrade(userId, displayName, sym, side, quantity, executionPrice);
+  }
 
   res.status(201).json({
     ...order,

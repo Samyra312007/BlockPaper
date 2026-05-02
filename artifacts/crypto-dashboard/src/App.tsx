@@ -10,6 +10,8 @@ import Portfolio from "@/pages/portfolio";
 import History from "@/pages/history";
 import Login from "@/pages/login";
 import AiAssistant from "@/pages/ai-assistant";
+import RoomPage from "@/pages/room";
+import RoomsLobby from "@/pages/rooms-lobby";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +36,8 @@ function Router() {
       <Route path="/portfolio" component={() => <ProtectedRoute component={Portfolio} />} />
       <Route path="/history" component={() => <ProtectedRoute component={History} />} />
       <Route path="/ai" component={() => <ProtectedRoute component={AiAssistant} />} />
+      <Route path="/rooms" component={() => <ProtectedRoute component={RoomsLobby} />} />
+      <Route path="/room/:code" component={() => <ProtectedRoute component={RoomPage} />} />
       <Route component={NotFound} />
     </Switch>
   );

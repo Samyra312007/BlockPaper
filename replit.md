@@ -26,6 +26,13 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
 
+## Email (Password Reset)
+
+Forgot-password emails are sent via Resend (`resend` npm package, installed on `@workspace/api-server`).
+The `RESEND_API_KEY` environment secret must be set for emails to actually deliver.
+If the key is absent, the reset URL is logged to the API server console instead (useful for dev/testing).
+The Replit Resend connector integration was dismissed by the user — use the `environment-secrets` skill to set `RESEND_API_KEY` directly when the user provides a key from resend.com.
+
 ## Features
 
 ### Core Trading

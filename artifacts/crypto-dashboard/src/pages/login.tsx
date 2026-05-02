@@ -443,7 +443,6 @@ export default function Login() {
           <Activity className="h-4 w-4 text-sky-500/50" />
           <span className="font-bold text-white/35 tracking-wide">BlockPaper</span>
         </div>
-        <p>Paper trading only — no real money involved. For educational purposes.</p>
       </footer>
     </div>
   );

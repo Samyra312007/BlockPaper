@@ -12,6 +12,8 @@ import History from "@/pages/history";
 import Login from "@/pages/login";
 import SignIn from "@/pages/signin";
 import SignUp from "@/pages/signup";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import AiAssistant from "@/pages/ai-assistant";
 import RoomPage from "@/pages/room";
 import RoomsLobby from "@/pages/rooms-lobby";
@@ -80,6 +82,8 @@ function Router() {
     <Switch>
       <Route path="/signin" component={() => <PublicOnlyRoute component={SignIn} />} />
       <Route path="/signup" component={() => <PublicOnlyRoute component={SignUp} />} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/" component={() => <ProtectedRoute component={Terminal} showLanding />} />
       <Route path="/portfolio" component={() => <ProtectedRoute component={Portfolio} />} />
       <Route path="/history" component={() => <ProtectedRoute component={History} />} />

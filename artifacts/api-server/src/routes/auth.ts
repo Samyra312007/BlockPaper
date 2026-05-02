@@ -1,8 +1,10 @@
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import { Resend } from "resend";
 import { Router, type IRouter, type Request, type Response } from "express";
 import { GetCurrentAuthUserResponse } from "@workspace/api-zod";
-import { db, usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { db, usersTable, passwordResetTokensTable } from "@workspace/db";
+import { eq, and, gt, isNull } from "drizzle-orm";
 import {
   clearSession,
   getSessionId,
@@ -10,6 +12,7 @@ import {
   SESSION_COOKIE,
   SESSION_TTL,
 } from "../lib/auth";
+import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 
@@ -30,6 +33,56 @@ function setSessionCookie(res: Response, sid: string) {
   });
 }
 
+async function sendResetEmail(
+  to: string,
+  resetUrl: string,
+  firstName: string | null,
+) {
+  const apiKey = process.env["RESEND_API_KEY"];
+  if (!apiKey) {
+    logger.info({ resetUrl, to }, "Password reset link (RESEND_API_KEY not set — log only)");
+    return;
+  }
+
+  const resend = new Resend(apiKey);
+  const name = firstName ?? "there";
+
+  await resend.emails.send({
+    from: "BlockPaper <onboarding@resend.dev>",
+    to: [to],
+    subject: "Reset your BlockPaper password",
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:0 auto;background:#070b12;color:#fff;padding:40px 32px;border-radius:16px;border:1px solid rgba(255,255,255,0.1)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px">
+          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#22d3ee,#3b82f6);display:flex;align-items:center;justify-content:center">
+            <span style="color:#fff;font-weight:900;font-size:16px">B</span>
+          </div>
+          <span style="font-size:18px;font-weight:700">Block<span style="color:#22d3ee">Paper</span></span>
+        </div>
+
+        <h1 style="font-size:22px;font-weight:700;margin:0 0 8px">Reset your password</h1>
+        <p style="color:rgba(255,255,255,0.5);font-size:14px;margin:0 0 24px;line-height:1.6">
+          Hi ${name}, we received a request to reset the password for your BlockPaper account.
+          Click the button below to choose a new password. This link expires in <strong style="color:#fff">1 hour</strong>.
+        </p>
+
+        <a href="${resetUrl}"
+           style="display:inline-block;padding:14px 28px;background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#fff;font-weight:700;font-size:15px;border-radius:12px;text-decoration:none;margin-bottom:24px">
+          Reset Password
+        </a>
+
+        <p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0;line-height:1.6">
+          If you didn't request this, you can safely ignore this email — your password won't change.<br><br>
+          Or copy and paste this link into your browser:<br>
+          <span style="color:#22d3ee;word-break:break-all">${resetUrl}</span>
+        </p>
+      </div>
+    `,
+  });
+}
+
+// ─── GET /api/auth/user ───────────────────────────────────────────────────────
+
 router.get("/auth/user", (req: Request, res: Response) => {
   res.json(
     GetCurrentAuthUserResponse.parse({
@@ -37,6 +90,8 @@ router.get("/auth/user", (req: Request, res: Response) => {
     }),
   );
 });
+
+// ─── POST /api/auth/signup ────────────────────────────────────────────────────
 
 router.post("/auth/signup", async (req: Request, res: Response) => {
   const { name, email, password } = req.body as {
@@ -51,9 +106,7 @@ router.post("/auth/signup", async (req: Request, res: Response) => {
   }
 
   if (password.length < 8) {
-    res
-      .status(400)
-      .json({ error: "Password must be at least 8 characters" });
+    res.status(400).json({ error: "Password must be at least 8 characters" });
     return;
   }
 
@@ -79,10 +132,28 @@ router.post("/auth/signup", async (req: Request, res: Response) => {
     .values({ email: emailLower, firstName, lastName, passwordHash })
     .returning();
 
-  const sid = await createSession({ user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, profileImageUrl: user.profileImageUrl } });
+  const sid = await createSession({
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      profileImageUrl: user.profileImageUrl,
+    },
+  });
   setSessionCookie(res, sid);
-  res.json({ user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, profileImageUrl: user.profileImageUrl } });
+  res.json({
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      profileImageUrl: user.profileImageUrl,
+    },
+  });
 });
+
+// ─── POST /api/auth/signin ────────────────────────────────────────────────────
 
 router.post("/auth/signin", async (req: Request, res: Response) => {
   const { email, password } = req.body as {
@@ -113,10 +184,130 @@ router.post("/auth/signin", async (req: Request, res: Response) => {
     return;
   }
 
-  const sid = await createSession({ user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, profileImageUrl: user.profileImageUrl } });
+  const sid = await createSession({
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      profileImageUrl: user.profileImageUrl,
+    },
+  });
   setSessionCookie(res, sid);
-  res.json({ user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, profileImageUrl: user.profileImageUrl } });
+  res.json({
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      profileImageUrl: user.profileImageUrl,
+    },
+  });
 });
+
+// ─── POST /api/auth/forgot-password ──────────────────────────────────────────
+
+router.post("/auth/forgot-password", async (req: Request, res: Response) => {
+  const { email } = req.body as { email?: string };
+
+  if (!email) {
+    res.status(400).json({ error: "Email is required" });
+    return;
+  }
+
+  // Always return success to prevent email enumeration
+  res.json({ message: "If that email exists, a reset link has been sent." });
+
+  const emailLower = email.toLowerCase().trim();
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.email, emailLower))
+    .limit(1);
+
+  if (!user || !user.passwordHash) return; // No account or Google-only account
+
+  // Delete existing unused tokens for this user
+  await db
+    .delete(passwordResetTokensTable)
+    .where(
+      and(
+        eq(passwordResetTokensTable.userId, user.id),
+        isNull(passwordResetTokensTable.usedAt),
+      ),
+    );
+
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+  await db.insert(passwordResetTokensTable).values({
+    token,
+    userId: user.id,
+    expiresAt,
+  });
+
+  const resetUrl = `${getOrigin(req)}/reset-password?token=${token}`;
+
+  try {
+    await sendResetEmail(emailLower, resetUrl, user.firstName);
+  } catch (err) {
+    logger.error({ err }, "Failed to send reset email");
+  }
+});
+
+// ─── POST /api/auth/reset-password ───────────────────────────────────────────
+
+router.post("/auth/reset-password", async (req: Request, res: Response) => {
+  const { token, password } = req.body as {
+    token?: string;
+    password?: string;
+  };
+
+  if (!token || !password) {
+    res.status(400).json({ error: "Token and password are required" });
+    return;
+  }
+
+  if (password.length < 8) {
+    res.status(400).json({ error: "Password must be at least 8 characters" });
+    return;
+  }
+
+  const [resetToken] = await db
+    .select()
+    .from(passwordResetTokensTable)
+    .where(
+      and(
+        eq(passwordResetTokensTable.token, token),
+        isNull(passwordResetTokensTable.usedAt),
+        gt(passwordResetTokensTable.expiresAt, new Date()),
+      ),
+    )
+    .limit(1);
+
+  if (!resetToken) {
+    res
+      .status(400)
+      .json({ error: "This reset link is invalid or has expired. Please request a new one." });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  await db
+    .update(usersTable)
+    .set({ passwordHash, updatedAt: new Date() })
+    .where(eq(usersTable.id, resetToken.userId));
+
+  await db
+    .update(passwordResetTokensTable)
+    .set({ usedAt: new Date() })
+    .where(eq(passwordResetTokensTable.token, token));
+
+  res.json({ message: "Password updated successfully" });
+});
+
+// ─── Google OAuth ─────────────────────────────────────────────────────────────
 
 router.get("/auth/google", (req: Request, res: Response) => {
   const clientId = process.env["GOOGLE_CLIENT_ID"];
@@ -268,6 +459,8 @@ router.get("/auth/google/callback", async (req: Request, res: Response) => {
   setSessionCookie(res, sid);
   res.redirect("/");
 });
+
+// ─── Logout ───────────────────────────────────────────────────────────────────
 
 router.post("/auth/logout", async (req: Request, res: Response) => {
   const sid = getSessionId(req);

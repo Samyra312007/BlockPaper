@@ -1,6 +1,6 @@
 # BlockPaper
 
-A full-stack crypto paper trading platform built with React, Express, and PostgreSQL. Practice trading Bitcoin, Ethereum, Solana, and BNB with $10,000 in virtual cash — no real money at risk.
+A full-stack crypto paper trading platform built with React, Express, and PostgreSQL. Practice trading Bitcoin, Ethereum, Solana, and BNB with $10,000 in virtual cash no real money at risk.
 
 **Live:** https://crypto-dashboard-demo--samayra312007.replit.app
 
@@ -151,7 +151,3 @@ pnpm --filter @workspace/db run push        # Push schema changes to DB
 | GET | `/rooms/:code` | Join a trading room |
 
 ---
-
-## License
-
-MIT

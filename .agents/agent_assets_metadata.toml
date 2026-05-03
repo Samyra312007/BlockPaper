@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "WKY6kPoy5VWz7gVsSuRXY"
+uri = "file://README.md"
+type = "text"
+title = "BlockPaper README"
